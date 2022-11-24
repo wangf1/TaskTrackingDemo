@@ -1,0 +1,2 @@
+admin,admin@example.com,01-11-12345678,admin,"ROLE_ADMIN,ROLE_MANAGER"
+Jack,jack@example.com,01-11-122345679,jack,"ROLE_USER"
