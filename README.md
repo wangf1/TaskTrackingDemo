@@ -45,7 +45,7 @@ This project is for demo Spring boot with ReactJs
     ```
 2. Run command to execute the jar
    ```
-   task_tracking_demo_executable-0.0.1.jar
+   java -jar backend/build/libs/task_tracking_demo_executable-0.0.1.jar
    ```
    > Note: login required, username/password is the same.
 
