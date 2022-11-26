@@ -12,6 +12,6 @@ frontend {
 
 tasks.register<Copy>("copyFrontend") {
     dependsOn("assembleFrontend")
-    from("$projectDir/build")
+    from("$projectDir/dist")
     into("../backend/build/resources/main/public/")
 }
