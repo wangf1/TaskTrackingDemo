@@ -1,3 +1,4 @@
+
 plugins {
 	java
 	id("org.springframework.boot")
@@ -27,6 +28,12 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+tasks{
+    withType<Test> {
+        useJUnitPlatform()
+    }
+
+	withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+		baseName = "task_tracking_demo_executable"
+	}
 }

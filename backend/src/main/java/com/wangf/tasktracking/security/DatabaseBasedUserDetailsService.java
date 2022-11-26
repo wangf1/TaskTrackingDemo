@@ -1,16 +1,13 @@
 package com.wangf.tasktracking.security;
 
+import com.wangf.tasktracking.model.User;
 import com.wangf.tasktracking.repository.UserRepositoryForLogin;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import com.wangf.tasktracking.model.User;
-import com.wangf.tasktracking.repository.UserRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
