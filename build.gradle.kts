@@ -11,6 +11,5 @@ subprojects {
 }
 
 tasks.getByPath(":backend:bootJarMainClassName").dependsOn(":frontend:copyFrontend")
-tasks.getByPath(":backend:bootRun").dependsOn(":frontend:copyFrontend")
 
 defaultTasks(":backend:bootJar")

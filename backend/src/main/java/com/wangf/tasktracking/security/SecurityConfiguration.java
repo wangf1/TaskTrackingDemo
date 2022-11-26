@@ -1,7 +1,9 @@
 package com.wangf.tasktracking.security;
 
+import com.wangf.tasktracking.util.ProjectConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -11,10 +13,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+@Profile(ProjectConstants.PROFILE_PROD)
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-
 public class SecurityConfiguration {
 
     @Bean
@@ -28,5 +30,6 @@ public class SecurityConfiguration {
                 .httpBasic();
         return http.build();
     }
+
 
 }
