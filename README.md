@@ -49,12 +49,13 @@ This project is for demo Spring boot with ReactJs
    ```
    > Note: login required, username/password is the same.
 
-### Missing part:
+### Missing parts / todos:
 
-* UT
-* CI/CD
-* Use MySQL or PostgreSQL rather than H2
-* Should not hardcode username/password
-* i18n
-* Error Handling
-* .....
+- UT
+- CI/CD
+- Use MySQL or PostgreSQL rather than H2
+- Should not hardcode username/password
+- i18n
+- Error Handling
+- Try to use template project such as free MUI templates which looks fancy
+- .....
