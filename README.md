@@ -55,4 +55,6 @@ This project is for demo Spring boot with ReactJs
 * CI/CD
 * Use MySQL or PostgreSQL rather than H2
 * Should not hardcode username/password
+* i18n
+* Error Handling
 * .....
