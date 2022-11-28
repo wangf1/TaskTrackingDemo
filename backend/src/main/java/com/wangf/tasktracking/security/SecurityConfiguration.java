@@ -27,7 +27,7 @@ public class SecurityConfiguration {
                 .passwordEncoder(new BCryptPasswordEncoder());
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
         http.authorizeRequests().anyRequest().authenticated().and().authenticationManager(authenticationManager)
-                .httpBasic();
+                .httpBasic().and().formLogin().and().csrf().disable();
         return http.build();
     }
 
