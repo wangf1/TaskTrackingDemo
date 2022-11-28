@@ -9,8 +9,6 @@ import {
   Link,
 } from "react-router-dom";
 
-import Router1 from "./route/routes";
-
 export default function App() {
   return (
     <div>
