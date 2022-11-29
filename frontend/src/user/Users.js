@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import ApiUtils from "../utils/ApiUtils";
+import EventBus from "../utils/EventBus";
 
 import styled from "styled-components";
 import { useTable, usePagination } from "react-table";
 import Grid from "@mui/material/Grid";
 
-import User from "./User";
+import UserForm from "./UserForm";
+import EditUserDialog from "./EditUserDialog";
+import UserCommon from "./UserUtils";
+
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const TableStyles = styled.div`
   padding: 1rem;
@@ -39,12 +46,15 @@ const TableStyles = styled.div`
   }
 `;
 
+const tablePropsRef = {};
+
 function Table({
   columns,
   data,
   fetchData,
   loading,
   pageCount: controlledPageCount,
+  tablePropsRef,
 }) {
   const {
     getTableProps,
@@ -72,6 +82,11 @@ function Table({
     },
     usePagination
   );
+
+  tablePropsRef["gotoPage"] = gotoPage;
+  tablePropsRef["pageIndex"] = pageIndex;
+  tablePropsRef["pageSize"] = pageSize;
+  tablePropsRef["pageCount"] = pageCount;
 
   useEffect(() => {
     fetchData({ pageIndex, pageSize });
@@ -199,7 +214,9 @@ function Users() {
               href={props.row.values.id + "edit"}
               onClick={(e) => {
                 e.preventDefault();
-                alert("Not implement yet.");
+                setEditDialogOpen(true);
+                const clonedUser = structuredClone(props.row.values);
+                setCurrentUser(clonedUser);
               }}
             >
               Edit
@@ -230,15 +247,21 @@ function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageCount, setPageCount] = useState(0);
+  const [currentUser, setCurrentUser] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    roles: "",
+  });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
 
   const fetchData = useCallback(({ pageSize, pageIndex }) => {
     setLoading(true);
-    axios
-      .get(ApiUtils.getApiUrl(`/users?page=${pageIndex}&size=${pageSize}`))
-      .then((response) => {
-        setUsers(response.data._embedded.users);
-        setPageCount(response.data.page.totalPages);
-      })
+    fetchDateDirectly(pageSize, pageIndex)
       .catch((error) => {
         console.log(error);
       })
@@ -247,23 +270,115 @@ function Users() {
       });
   }, []);
 
+  const fetchDateDirectly = function (pageSize, pageIndex) {
+    return axios
+      .get(ApiUtils.getApiUrl(`/users?page=${pageIndex}&size=${pageSize}`))
+      .then((response) => {
+        setUsers(response.data._embedded.users);
+        setPageCount(response.data.page.totalPages);
+      });
+  };
+
+  EventBus.on("showSnackBar", (e) => {
+    setSnackbarOpen(true);
+    let message;
+    if (e.severity == "success") {
+      message = `Successfully create user with name '${currentUser.name}'.`;
+    } else {
+      message = `Fail to create user with name '${currentUser.name}'.`;
+    }
+    setSnackbarMessage(message);
+    setSeverity(e.severity);
+  });
+
+  EventBus.on("fetchData", (e = {}) => {
+    let pageIndex = tablePropsRef.pageIndex;
+    if (e.goLastPage) {
+      pageIndex = tablePropsRef.pageCount - 1;
+    }
+    fetchDateDirectly(tablePropsRef.pageSize, pageIndex);
+  });
+
+  const onClickReset = function (e) {
+    setCurrentUser({
+      name: "",
+      phone: "",
+      email: "",
+      roles: "",
+    });
+    EventBus.emit("resetForm");
+  };
+  const onClickSave = function (e) {
+    UserCommon.saveUser(currentUser)
+      .then(function (response) {
+        setSnackbarOpen(true);
+        setSnackbarMessage(
+          `Successfully create user with name '${currentUser.name}'.`
+        );
+        setSeverity("success");
+        EventBus.emit("fetchData", { goLastPage: true });
+        console.log(response);
+      })
+      .catch(function (error) {
+        setSnackbarOpen(true);
+        setSnackbarMessage(
+          `Fail to create user with name '${currentUser.name}'.`
+        );
+        setSeverity("error");
+        console.log(error);
+      });
+  };
+
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={2}>
-        <User />
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={2} container justifyContent="flex-end">
+          <Grid item xs={12}>
+            <UserForm user={currentUser} />
+          </Grid>
+          <Grid item xs={4}>
+            <Button variant="outlined" onClick={onClickReset}>
+              Reset
+            </Button>
+          </Grid>
+          <Grid item xs={3}>
+            <Button variant="contained" onClick={onClickSave}>
+              Save
+            </Button>
+          </Grid>
+        </Grid>
+
+        <Grid item xs={10}>
+          <TableStyles>
+            <Table
+              columns={columns}
+              data={users}
+              fetchData={fetchData}
+              loading={loading}
+              pageCount={pageCount}
+              tablePropsRef={tablePropsRef}
+            />
+          </TableStyles>
+        </Grid>
+
+        <Grid item xs={3}>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={(e) => {
+              setSnackbarOpen(false);
+            }}
+          >
+            <Alert severity={severity}>{snackbarMessage}</Alert>
+          </Snackbar>
+        </Grid>
       </Grid>
-      <Grid item xs={10}>
-        <TableStyles>
-          <Table
-            columns={columns}
-            data={users}
-            fetchData={fetchData}
-            loading={loading}
-            pageCount={pageCount}
-          />
-        </TableStyles>
-      </Grid>
-    </Grid>
+
+      <EditUserDialog
+        openState={[editDialogOpen, setEditDialogOpen]}
+        userState={[currentUser, setCurrentUser]}
+      />
+    </>
   );
 }
 
