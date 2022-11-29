@@ -58,4 +58,6 @@ This project is for demo Spring boot with ReactJs
 - i18n
 - Error Handling
 - Try to use template project such as free MUI templates which looks fancy
+- Validation, especially for email and password
+- Use multiple selection component for user roles
 - .....

@@ -21,7 +21,7 @@ public class SecurityConfigurationDev {
 
     @Bean
     public SecurityFilterChain filterChainDev(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
-        http.authorizeRequests().anyRequest().permitAll().and().cors();
+        http.authorizeRequests().anyRequest().permitAll().and().cors().and().csrf().disable();
         return http.build();
     }
 

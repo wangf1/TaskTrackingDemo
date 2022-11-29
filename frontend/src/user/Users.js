@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import ApiUtils from "../utils/ApiUtils";
 
 import styled from "styled-components";
 import { useTable, usePagination } from "react-table";
+import Grid from "@mui/material/Grid";
 
-const Styles = styled.div`
+import User from "./User";
+
+const TableStyles = styled.div`
   padding: 1rem;
-
   table {
     border-spacing: 0;
-    border: 1px solid black;
+    border: 1px solid gray;
 
     tr {
       :last-child {
@@ -24,9 +26,8 @@ const Styles = styled.div`
     td {
       margin: 0;
       padding: 0.5rem;
-      border-bottom: 1px solid black;
-      border-right: 1px solid black;
-
+      border-bottom: 1px solid gray;
+      border-right: 1px solid gray;
       :last-child {
         border-right: 0;
       }
@@ -72,7 +73,7 @@ function Table({
     usePagination
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchData({ pageIndex, pageSize });
   }, [fetchData, pageIndex, pageSize]);
 
@@ -173,8 +174,8 @@ function Table({
   );
 }
 
-function App() {
-  const columns = React.useMemo(
+function Users() {
+  const columns = useMemo(
     () => [
       {
         Header: "Name",
@@ -190,14 +191,16 @@ function App() {
       },
       {
         Header: "Actions",
-        accessor: "_links.self.href",
-        Cell: ({ cell: { value } }) => {
+        accessor: "id",
+        Cell: (props) => {
           const Edit = () => (
             <a
               className="App-link"
-              href={value}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={props.row.values.id + "edit"}
+              onClick={(e) => {
+                e.preventDefault();
+                alert("Not implement yet.");
+              }}
             >
               Edit
             </a>
@@ -205,9 +208,11 @@ function App() {
           const Delete = () => (
             <a
               className="App-link"
-              href={value}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={props.row.values.id + "delete"}
+              onClick={(e) => {
+                e.preventDefault();
+                alert("Not implement yet.");
+              }}
             >
               Delete
             </a>
@@ -222,12 +227,11 @@ function App() {
     ],
     []
   );
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pageCount, setPageCount] = useState(0);
 
-  const [users, setUsers] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
-  const [pageCount, setPageCount] = React.useState(0);
-
-  const fetchData = React.useCallback(({ pageSize, pageIndex }) => {
+  const fetchData = useCallback(({ pageSize, pageIndex }) => {
     setLoading(true);
     axios
       .get(ApiUtils.getApiUrl(`/users?page=${pageIndex}&size=${pageSize}`))
@@ -244,16 +248,23 @@ function App() {
   }, []);
 
   return (
-    <Styles>
-      <Table
-        columns={columns}
-        data={users}
-        fetchData={fetchData}
-        loading={loading}
-        pageCount={pageCount}
-      />
-    </Styles>
+    <Grid container spacing={2}>
+      <Grid item xs={2}>
+        <User />
+      </Grid>
+      <Grid item xs={10}>
+        <TableStyles>
+          <Table
+            columns={columns}
+            data={users}
+            fetchData={fetchData}
+            loading={loading}
+            pageCount={pageCount}
+          />
+        </TableStyles>
+      </Grid>
+    </Grid>
   );
 }
 
-export default App;
+export default Users;
