@@ -10,7 +10,7 @@ This project is for demo Spring boot with ReactJs
    ```
    ./gradlew clean bootRun --args='--spring.profiles.active=dev'
    ```
-2. Run following command in frontend directory:
+2. Run following command in frontendv2 directory:
    ```
    npm start
    ```
