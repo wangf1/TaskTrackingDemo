@@ -12,5 +12,5 @@ pluginManagement {
     }
 }
 
-include(":frontend")
+include(":frontendv2")
 include(":backend")
