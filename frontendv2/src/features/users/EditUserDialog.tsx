@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Button,
   Dialog,
@@ -10,13 +9,32 @@ import {
 
 import { Close } from "@mui/icons-material";
 import UserDetails from "./UserDetails";
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import {
+  createUser,
+  selectCurrentUser,
+  selectOpenEditUserDialog,
+  setEditUserDialogOpen,
+} from "./usersSlice";
 
 export default function EditUserDialog() {
+  const open = useAppSelector(selectOpenEditUserDialog);
+  const currentUser = useAppSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
+
+  const handleClose = () => {
+    dispatch(setEditUserDialogOpen(false));
+  };
+
+  const handleSave = () => {
+    dispatch(createUser(currentUser));
+  };
+
   return (
     <>
-      <Dialog open={false}>
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle align="right">
-          <IconButton>
+          <IconButton onClick={handleClose}>
             <Close />
           </IconButton>
         </DialogTitle>
@@ -24,7 +42,7 @@ export default function EditUserDialog() {
           <UserDetails />
         </DialogContent>
         <DialogActions>
-          <Button>Save</Button>
+          <Button onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
     </>

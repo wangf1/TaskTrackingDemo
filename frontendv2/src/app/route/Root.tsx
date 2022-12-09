@@ -1,9 +1,7 @@
 import { Stack } from "@mui/system";
-import React from "react";
 import { BrowserRouter, Link, Outlet, Route, Routes } from "react-router-dom";
-import UsersPage from "../../features/users/UsersPage";
+import UsersMainPage from "../../features/users/UsersMainPage";
 
-import UsersTable from "../../features/users/UsersTable";
 function Layout() {
   return (
     <div>
@@ -40,8 +38,8 @@ export default function Root() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<UsersPage />} />
-            <Route path="/users" element={<UsersPage />} />
+            <Route index element={<UsersMainPage />} />
+            <Route path="/users" element={<UsersMainPage />} />
             <Route path="/tasks" element={<>Tasks Not Implement Yet</>} />
             <Route path="*" element={<NoMatch />} />
           </Route>

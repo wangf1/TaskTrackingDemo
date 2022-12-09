@@ -1,4 +1,6 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,6 +9,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+
+import {
+  fetchUsers,
+  selectTotalUsersCount,
+  selectUsers,
+  setCurrentUser,
+} from "./usersSlice";
 
 interface Column {
   id: "name" | "phone" | "email" | "roles";
@@ -23,43 +32,17 @@ const columns: readonly Column[] = [
   { id: "roles", label: "Roles", minWidth: 170 },
 ];
 
-interface Data {
-  name: string;
-  phone: string;
-  email: string;
-  roles: string;
-}
-
-function createData(
-  name: string,
-  phone: string,
-  email: string,
-  roles: string
-): Data {
-  return { name, phone, email, roles };
-}
-
-const rows = [
-  createData("India", "IN", "1324171354", "3287263"),
-  createData("China", "CN", "1403500365", "9596961"),
-  createData("Italy", "IT", "60483973", "301340"),
-  createData("United States", "US", "327167434", "9833520"),
-  createData("Canada", "CA", "37602103", "9984670"),
-  createData("Australia", "AU", "25475400", "7692024"),
-  createData("Germany", "DE", "83019200", "357578"),
-  createData("Ireland", "IE", "4857000", "70273"),
-  createData("Mexico", "MX", "126577691", "1972550"),
-  createData("Japan", "JP", "126317000", "377973"),
-  createData("France", "FR", "67022000", "640679"),
-  createData("United Kingdom", "GB", "67545757", "242495"),
-  createData("Russia", "RU", "146793744", "17098246"),
-  createData("Nigeria", "NG", "200962417", "923768"),
-  createData("Brazil", "BR", "210147125", "8515767"),
-];
-
 export default function StickyHeadTable() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const totalUsersCount = useAppSelector(selectTotalUsersCount);
+  const users = useAppSelector(selectUsers);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUsers({ pageIndex: page, pageSize: rowsPerPage }));
+  }, [dispatch, rowsPerPage, page]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -71,7 +54,7 @@ export default function StickyHeadTable() {
   };
 
   return (
-    <Paper sx={{ width: "70%", overflow: "hidden" }}>
+    <Paper sx={{ overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: "100%" }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -88,31 +71,51 @@ export default function StickyHeadTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.phone}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === "number"
-                            ? column.format(value)
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+            {users.map((user) => {
+              return (
+                <TableRow hover role="checkbox" tabIndex={-1} key={user.id}>
+                  {columns.map((column) => {
+                    const value = user[column.id];
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        {column.format && typeof value === "number"
+                          ? column.format(value)
+                          : value}
+                      </TableCell>
+                    );
+                  })}
+                  <TableCell>
+                    <a
+                      className="App-link"
+                      href={user.id + "-edit"}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        dispatch(setCurrentUser(user));
+                      }}
+                    >
+                      Edit
+                    </a>{" "}
+                    <a
+                      className="App-link"
+                      href={user.id + "-delete"}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        alert("Not implement yet.");
+                      }}
+                    >
+                      Delete
+                    </a>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={totalUsersCount}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

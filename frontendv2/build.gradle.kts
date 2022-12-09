@@ -6,8 +6,6 @@ frontend {
      nodeVersion.set("19.1.0")
      installScript.set("install")
      assembleScript.set("run build")
-     cleanScript.set("run clean")
-     checkScript.set("run check")
 }
 
 tasks.register<Copy>("copyFrontend") {
